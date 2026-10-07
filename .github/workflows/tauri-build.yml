@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,19 +28,15 @@ jobs:
         run: cd studora-desktop && npm ci
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           target: x86_64-pc-windows-msvc
 
       - name: Cache Rust dependencies
-        uses: actions/cache@v4
+        uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            studora-desktop/src-tauri/target
-          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-
+          workspaces: './src-tauri -> target'
 
       - name: Build frontend
         run: cd studora-desktop && npm run build
@@ -46,36 +44,15 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
 
-      - name: Build Tauri Windows app
-        run: cd studora-desktop && npx tauri build
-        env:
-          TAURI_TOKEN: ${{ secrets.TAURI_TOKEN }}
-
-      - name: Upload Windows installer as artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: studora-windows-installer
-          path: |
-            studora-desktop/src-tauri/target/release/bundle/nsis/*.exe
-            studora-desktop/src-tauri/target/release/bundle/nsis/*.msi
-          retention-days: 30
-
-      - name: Create GitHub Release (for tagged builds)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            studora-desktop/src-tauri/target/release/bundle/nsis/*.exe
-            studora-desktop/src-tauri/target/release/bundle/nsis/*.msi
+      - name: Build and release Tauri app
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: ./studora-desktop
+          tagName: v__VERSION__
+          releaseName: 'Studora v__VERSION__'
+          releaseBody: 'Se nedladdningsbara filer för denna version.'
+          releaseDraft: false
+          prerelease: false
 
-      - name: Publish Tauri update (for tagged builds)
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          cd studora-desktop
-          npx tauri publish --verbose
-        env:
-          TAURI_TOKEN: ${{ secrets.TAURI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
