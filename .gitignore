@@ -16,3 +16,6 @@ supabase/.branches/
 # Övrigt
 *.log
 .DS_Store
+
+# Build-output
+dist/

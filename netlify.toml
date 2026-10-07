@@ -1,0 +1,28 @@
+# Netlify-konfiguration för Studora
+# https://docs.netlify.com/configure-builds/overview/
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Miljövariabler – sätt dessa i Netlify Dashboard → Site settings → Environment variables
+# SUPABASE_URL = https://<ditt-projekt>.supabase.co
+# SUPABASE_PUBLISHABLE_KEY = eyJh...
+
+# GitHub login omdirigering – Netlify måste veta att auth-callback från Supabase är OK
+# Supabase använder /auth/v1/callback som default callback-URL
+# Vi lägger till en rewrite-regel så att alla /auth/*-förfrågningar hanteras korrekt
+
+[[redirects]]
+  from = "/auth/v1/callback"
+  to = "/login.html"
+  status = 302
+  force = true
+
+# Säkerhets-headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
