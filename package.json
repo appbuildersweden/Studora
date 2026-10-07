@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "web": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "@supabase/server": "^1.9.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3"
+  },
+  "devDependencies": {
+    "supabase": "^2.120.0"
+  }
+}

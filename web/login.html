@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studora – Logga in</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="brand">
+      <img class="brand-logo" src="logo.png" alt="Studora-logotyp" />
+      <p class="brand-name">STUDORA</p>
+      <p class="brand-tag">Skolplattform för elever, lärare och chefer.</p>
+    </aside>
+
+    <main class="content">
+      <h1>Välkommen till Studora</h1>
+      <p class="sub">Logga in med ditt konto.</p>
+
+      <form id="loginform">
+        <div class="field">
+          <label for="email">E-postadress</label>
+          <input id="email" name="email" type="email" autocomplete="username" required />
+        </div>
+
+        <div class="field">
+          <label for="password">Lösenord</label>
+          <div class="pw-wrap">
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+            <button class="pw-toggle" id="pwToggle" type="button" aria-label="Visa lösenord" title="Visa lösenord">
+              <svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-4-7-9-7-11-7A19.6 19.6 0 0 1 12 4c7 0 11 8 11 8a19.5 19.5 0 0 1-2.2 3.2" />
+                <path d="M9.9 9.9a3 3 0 1 0 4.2 4.2" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <p class="msg" id="msg" role="alert" aria-live="polite"></p>
+
+        <button class="btn-primary" id="login" type="submit">Logga in</button>
+      </form>
+
+      <form id="resetform" class="hidden">
+        <h1>Glömt lösenord?</h1>
+        <p class="sub">Ange e-postadressen som är kopplad till kontot så skickar vi en länk för att återställa lösenordet.</p>
+
+        <div class="field">
+          <label for="resetEmail">E-postadress</label>
+          <input id="resetEmail" type="email" autocomplete="username" required />
+        </div>
+
+        <p class="msg" id="resetMsg" role="alert" aria-live="polite"></p>
+
+        <button class="btn-primary" id="reset" type="submit">Skicka återställningslänk</button>
+      </form>
+
+      <p class="foot">Studora – skolplattform</p>
+    </main>
+  </div>
+
+  <script type="module">
+    import { supabase, roleLabel, requireSession, fetchProfile } from './lib.js';
+
+    const msg = document.getElementById('msg');
+    const resetMsg = document.getElementById('resetMsg');
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (session?.session) {
+        location.replace('app.html');
+        return;
+      }
+
+      document.getElementById('pwToggle').addEventListener('click', () => {
+        const pw = document.getElementById('password');
+        const show = pw.type === 'password';
+        pw.type = show ? 'text' : 'password';
+        const btn = document.getElementById('pwToggle');
+        btn.setAttribute('aria-label', show ? 'Dölj lösenord' : 'Visa lösenord');
+        btn.title = show ? 'Dölj lösenord' : 'Visa lösenord';
+        btn.innerHTML = show
+          ? `<svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-4-7-9-7-11-7A19.6 19.6 0 0 1 12 4c7 0 11 8 11 8a19.5 19.5 0 0 1-2.2 3.2"/><path d="M9.9 9.9a3 3 0 1 0 4.2 4.2"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+          : `<svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+      });
+
+      document.getElementById('loginform').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msg.textContent = '';
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email) { msg.textContent = 'Ange din e-postadress.'; document.getElementById('email').focus(); return; }
+        if (!password) { msg.textContent = 'Ange ditt lösenord.'; document.getElementById('password').focus(); return; }
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          msg.textContent = 'Fel e-postadress eller lösenord.';
+          return;
+        }
+        location.replace('app.html');
+      });
+
+      document.getElementById('resetform').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        resetMsg.textContent = '';
+
+        const email = document.getElementById('resetEmail').value.trim();
+        if (!email) { resetMsg.textContent = 'Ange din e-postadress.'; return; }
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/reset.html' });
+        if (error) {
+          resetMsg.textContent = 'Kunde inte skicka återställningslänken. Försök igen.';
+          return;
+        }
+        resetMsg.textContent = 'Om e-postadressen är registrerad har vi skickat en återställningslänk.';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studora – Inloggad</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="brand">
+      <img class="brand-logo" src="logo.png" alt="Studora-logotyp" />
+      <p class="brand-name">STUDORA</p>
+      <p class="brand-tag">Skolplattform för elever, lärare och chefer.</p>
+    </aside>
+
+    <main class="content">
+      <h1>Välkommen till Studora</h1>
+      <p class="sub">Du är inloggad.</p>
+
+      <div class="card">
+        <p>Din session är aktiv.</p>
+      </div>
+
+      <button id="logout" class="link" type="button">Logga ut</button>
+    </main>
+  </div>
+
+  <script type="module">
+    import { supabase, roleLabel, requireSession, fetchProfile } from './lib.js';
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const session = await requireSession();
+      if (!session) return;
+
+      const { profile, error } = await fetchProfile();
+      if (error || !profile) {
+        document.querySelector('.sub').textContent = 'Kunde inte läsa din profil.';
+        return;
+      }
+
+      document.querySelector('.sub').textContent =
+        session.user.email + ' · ' + roleLabel(profile.role);
+
+      document.getElementById('logout').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>

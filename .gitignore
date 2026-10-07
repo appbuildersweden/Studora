@@ -1,0 +1,18 @@
+# Secrets – aldrig i GitHub
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Genererad webbkonfig (från .env)
+web/config.js
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
+
+# Övrigt
+*.log
+.DS_Store

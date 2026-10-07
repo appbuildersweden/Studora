@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studora – Nytt lösenord</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+  <script>
+    (() => {
+      const saved = localStorage.getItem('studora-theme');
+      const theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+</head>
+<body>
+  <main class="box">
+    <h1>Välj nytt lösenord</h1>
+    <p class="sub">Du kom hit via återställningslänken.</p>
+    <form id="pwForm">
+      <label>Nytt lösenord
+        <input type="password" id="newPw" autocomplete="new-password" minlength="8" required />
+      </label>
+      <button type="submit">Spara lösenord</button>
+      <p id="msg" class="msg" role="status"></p>
+    </form>
+    <button id="backBtn" class="link">Till inloggningen</button>
+  </main>
+
+  <script type="module">
+    import { supabase } from './lib.js';
+    const msg = document.getElementById('msg');
+
+    // Återställningstoken finns i URL-hashen → session skapas automatiskt (detectSessionInUrl)
+    const { data } = await supabase.auth.getSession();
+    if (!data?.session) {
+      msg.textContent = 'Ogiltig eller utgången återställningslänk. Begär en ny via "Glömt lösenord?".';
+    }
+
+    document.getElementById('pwForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await supabase.auth.updateUser({
+        password: document.getElementById('newPw').value,
+      });
+      if (error) { msg.textContent = 'Fel: ' + error.message; return; }
+      await supabase.auth.signOut();
+      msg.textContent = 'Lösenordet är sparat. Logga in med det nya.';
+      setTimeout(() => (location.href = 'login.html'), 1200);
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => (location.href = 'login.html'));
+  </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+/* Studora designsystem – steg 3 (login)
+   Ren svensk skolplattform: lugna färger, inga gradienter, ljus/mörk. */
+
+:root {
+  --bg: #f3f5f8;
+  --card: #ffffff;
+  --text: #1c2733;
+  --muted: #5d6b7c;
+  --border: #d4dae2;
+  --input-bg: #ffffff;
+  --accent: #1d4ed8;
+  --accent-hover: #1743b8;
+  --accent-contrast: #ffffff;
+  --error: #b42318;
+  --success: #067647;
+  --brand-bg: #12243a;
+  --brand-text: #ffffff;
+  --brand-muted: rgba(255, 255, 255, 0.72);
+  --logo-plate: #f7f8fa;
+  --focus: #1d4ed8;
+}
+
+[data-theme='dark'] {
+  --bg: #0e1319;
+  --card: #161d27;
+  --text: #e7ecf3;
+  --muted: #9aa7b8;
+  --border: #2a3441;
+  --input-bg: #111821;
+  --accent: #4b7bec;
+  --accent-hover: #5f8cf0;
+  --accent-contrast: #ffffff;
+  --error: #f2a1a1;
+  --success: #75d3a4;
+  --brand-bg: #0b1622;
+  --brand-text: #eef2f7;
+  --brand-muted: rgba(238, 242, 247, 0.7);
+  --logo-plate: #f7f8fa;
+  --focus: #7aa2ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Layout ---------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 34%) 1fr;
+  min-height: 100vh;
+}
+
+.brand {
+  background: var(--brand-bg);
+  color: var(--brand-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 48px 44px;
+}
+
+.brand-logo {
+  width: 200px;
+  max-width: 100%;
+  height: auto;
+  background: var(--logo-plate);
+  border-radius: 10px;
+  padding: 12px;
+  display: block;
+}
+
+.brand-name {
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  margin: 0;
+}
+
+.brand-tag {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.95rem;
+  max-width: 26ch;
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  min-width: 0;
+}
+
+/* ---------- Kort / formulär ---------- */
+
+.box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 34px 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.sub {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+input:focus,
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+input:focus {
+  border-color: var(--focus);
+}
+
+.field { margin-bottom: 16px; }
+
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 46px; }
+
+.pw-toggle {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+}
+.pw-toggle:hover { color: var(--text); }
+.pw-toggle svg { width: 20px; height: 20px; }
+.pw-toggle .eye-off { display: none; }
+.pw-toggle[aria-pressed='true'] .eye { display: none; }
+.pw-toggle[aria-pressed='true'] .eye-off { display: block; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 46px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:disabled { opacity: 0.7; cursor: default; }
+
+.btn-quiet {
+  width: 100%;
+  height: 46px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+button.link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  padding: 4px 2px;
+  width: auto;
+}
+button.link:hover { color: var(--accent-hover); }
+
+.row-end {
+  display: flex;
+  justify-content: flex-end;
+  margin: 4px 0 14px;
+}
+
+.msg {
+  font-size: 0.9rem;
+  min-height: 1.2em;
+  margin: 0 0 12px;
+  color: var(--error);
+}
+.msg:empty { margin-bottom: 4px; }
+.msg.ok { color: var(--success); }
+
+.hint { font-size: 0.8rem; color: var(--muted); margin-top: 14px; }
+
+.foot {
+  margin-top: 18px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.hidden, [hidden] { display: none !important; }
+
+/* ---------- Temaväxlare ---------- */
+
+.theme-toggle {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  padding: 0;
+}
+.theme-toggle:hover { color: var(--text); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .icon-sun { display: none; }
+[data-theme='dark'] .theme-toggle .icon-sun { display: block; }
+[data-theme='dark'] .theme-toggle .icon-moon { display: none; }
+
+/* ---------- Övrigt (app/reset från steg 2) ---------- */
+
+.tests { margin: 10px 0 16px; }
+.tests button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+.tests button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- Responsivt ---------- */
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .brand {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+  }
+  .brand-logo { width: 64px; padding: 6px; border-radius: 8px; }
+  .brand-name { font-size: 1.25rem; letter-spacing: 0.16em; }
+  .brand-tag { display: none; }
+  .content { padding: 32px 16px; justify-content: flex-start; }
+  .box { padding: 26px 20px; }
+  .theme-toggle { top: 12px; right: 12px; }
+}
+
+@media (max-width: 420px) {
+  .box { padding: 22px 16px; }
+  h1 { font-size: 1.2rem; }
+}

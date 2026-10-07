@@ -1,0 +1,3 @@
+-- Studora – steg 1: grundstruktur
+-- Skapar roller (admin, student), profiles och user_settings.
+-- Inga tabeller för uppgifter, quiz, AI eller filer ännu.

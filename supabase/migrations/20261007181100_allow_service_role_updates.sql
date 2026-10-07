@@ -1,0 +1,4 @@
+-- Steg 2 – fix: backend (service role) måste kunna sätta roller när chef skapar konton.
+-- Säkerhet: utan inloggad användare (auth.uid() is null) når bara service role
+-- fram till triggern – anon/medborgare har ingen UPDATE-policy alls (RLS),
+-- och inloggade utan chef-roll kastas fortfarande ut.
