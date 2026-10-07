@@ -1,0 +1,19 @@
+# Cloudflare Pages konfiguration för Studora
+# Detta är en STATISK sida – ingen Workers-kod
+# public-directory pekar på build-output-katalogen
+
+[site]
+bucket = "./dist"
+entry-point = ""
+
+# Build-kommando (används av Cloudflare Pages vid deployment)
+[build]
+command = "npm run build"
+publish = "dist"
+
+# Miljövariabler som Cloudflare Pages ska använda vid build
+# Dessa sätts i Cloudflare Dashboard → Settings → Environment Variables
+# SUPABASE_URL: din Supabase-projektets URL
+# SUPABASE_PUBLISHABLE_KEY: din publika Supabase-nyckel
+
+# Ingen Workers-konfiguration behövs för en statisk sida
