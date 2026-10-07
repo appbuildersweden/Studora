@@ -1,0 +1,61 @@
+{
+  "name": "studora-desktop",
+  "version": "1.0.0",
+  "description": "Studora – Skolplattform för elever, lärare och chefer",
+  "main": "dist-electron/electron/index.js",
+  "scripts": {
+    "dev": "electron .",
+    "build": "tsc && electron-builder",
+    "build:win": "tsc && electron-builder --win",
+    "rebuild": "electron-rebuild -f -w electron"
+  },
+  "author": "Studora",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-updater": "^6.8.9",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3"
+  },
+  "build": {
+    "appId": "se.studora.app",
+    "productName": "Studora",
+    "publish": {
+      "provider": "github",
+      "owner": "appbuildersweden",
+      "repo": "Studora"
+    },
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "icon": "../web/STUDORA.ico",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "../web/STUDORA.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Studora"
+    }
+  }
+}

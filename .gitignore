@@ -5,6 +5,7 @@
 
 # Dependencies
 node_modules/
+studora-desktop/node_modules/
 
 # Genererad webbkonfig (från .env)
 web/config.js
@@ -13,9 +14,18 @@ web/config.js
 supabase/.temp/
 supabase/.branches/
 
-# Övrigt
-*.log
-.DS_Store
-
 # Build-output
 dist/
+studora-desktop/dist-electron/
+studora-desktop/release/
+
+# Lokala utvecklingsfiler
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# Identitetsfiler och andra onödiga filer
+.web/
+
+# Ignorera icke-korrekt logo/ikon filer
+web/logo-Jens.png
