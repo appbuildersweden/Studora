@@ -1,0 +1,30 @@
+appId: se.studora.app
+productName: Studora
+directories:
+  output: release
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - node_modules/**/*
+icon: web/STUDORA.ico
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: web/STUDORA.ico
+  sign: false
+  forceCodeSigning: false
+  publish:
+    provider: github
+    owner: appbuildersweden
+    repo: Studora
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Studora
+

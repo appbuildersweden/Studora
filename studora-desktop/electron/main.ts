@@ -1,46 +1,65 @@
 import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-import { autoUpdater } from 'electron-updater';
 
 let mainWindow: BrowserWindow | null = null;
 let updateInterval: NodeJS.Timeout | null = null;
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
-export function setupAutoUpdater() {
-  autoUpdater.autoDownload = false;
+let _autoUpdater: any = null;
 
-  autoUpdater.on('checking-for-update', () => {
+function getAutoUpdater(): any {
+  if (!_autoUpdater) {
+    try {
+      _autoUpdater = require('electron-updater').autoUpdater;
+    } catch (err) {
+      console.warn('[Updater] electron-updater inte tillgänglig:', (err as Error).message);
+      return null;
+    }
+  }
+  return _autoUpdater;
+}
+
+export function setupAutoUpdater() {
+  const updater = getAutoUpdater();
+  if (!updater) {
+    console.warn('[Updater] Kan inte initiera auto-updater – hoppar över');
+    return;
+  }
+
+  updater.autoDownload = false;
+
+  updater.on('checking-for-update', () => {
     console.log('[Updater] Kontrollerar efter uppdatering...');
   });
 
-  autoUpdater.on('update-available', (info: any) => {
+  updater.on('update-available', (info: any) => {
     console.log('[Updater] Ny version tillgänglig:', info?.version);
     if (mainWindow) {
       mainWindow.webContents.send('update-available', info);
     }
   });
 
-  autoUpdater.on('update-not-available', () => {
+  updater.on('update-not-available', () => {
     console.log('[Updater] Ingen ny version.');
   });
 
-  autoUpdater.on('download-progress', (progress: any) => {
+  updater.on('download-progress', (progress: any) => {
     console.log(`[Updater] Framsteg: ${progress?.percent?.toFixed(1)}%`);
     if (mainWindow) {
       mainWindow.webContents.send('update-progress', progress);
     }
   });
 
-  autoUpdater.on('update-downloaded', (info: any) => {
+  updater.on('update-downloaded', (info: any) => {
     console.log('[Updater] Uppdatering nedladdad:', info?.version);
     if (mainWindow) {
       mainWindow.webContents.send('update-downloaded', info);
     }
   });
 
-  autoUpdater.on('error', (err: any) => {
+  updater.on('error', (err: any) => {
     console.error('[Updater] Fel:', err?.message);
   });
 }
@@ -50,8 +69,13 @@ function checkForUpdates() {
     console.log('[Updater] Körs i dev-läge – hoppar över auto-update-kontroll');
     return;
   }
-  autoUpdater.checkForUpdates().catch(err => {
-    console.error('[Updater] Fel vid uppdateringskontroll:', err.message);
+  const updater = getAutoUpdater();
+  if (!updater) {
+    console.warn('[Updater] Auto-updater inte tillgänglig – hoppar över');
+    return;
+  }
+  updater.checkForUpdates().catch((err: any) => {
+    console.error('[Updater] Fel vid uppdateringskontroll:', err?.message);
   });
 }
 
@@ -74,12 +98,8 @@ function createWindow() {
     backgroundColor: '#f3f5f8',
   });
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow?.setIcon(iconPath);
-    mainWindow?.show();
-  });
-
   mainWindow.once('ready-to-show', () => {
+    mainWindow?.setIcon(iconPath);
     mainWindow?.show();
   });
 

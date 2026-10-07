@@ -1,9 +1,20 @@
 import { ipcMain, app } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
-import { autoUpdater } from 'electron-updater';
-
 let configData: { supabaseUrl?: string; supabaseKey?: string } | null = null;
+let autoUpdater: any = null;
+
+function getAutoUpdater(): any {
+  if (!autoUpdater) {
+    try {
+      autoUpdater = require('electron-updater').autoUpdater;
+    } catch (err) {
+      console.warn('[Updater] electron-updater inte tillgänglig:', (err as Error).message);
+      return null;
+    }
+  }
+  return autoUpdater;
+}
 
 function getConfigPath(): string {
   const userDataPath = app.getPath('userData');
@@ -69,8 +80,12 @@ export function initIpcHandlers() {
     if (!app.isPackaged) {
       return { error: 'Dev-läge – auto-update är inaktiverat' };
     }
+    const updater = getAutoUpdater();
+    if (!updater) {
+      return { error: 'Auto-update är inte tillgängligt' };
+    }
     try {
-      const result = await autoUpdater.checkForUpdates();
+      const result = await updater.checkForUpdates();
       return { updateAvailable: true, version: (result as any)?.version };
     } catch (err) {
       if ((err as any).message?.includes('No server configured') || (err as any).message?.includes('Cannot check for updates')) {
@@ -84,8 +99,12 @@ export function initIpcHandlers() {
     if (!app.isPackaged) {
       return { error: 'Dev-läge – auto-update är inaktiverat' };
     }
+    const updater = getAutoUpdater();
+    if (!updater) {
+      return { error: 'Auto-update är inte tillgängligt' };
+    }
     try {
-      autoUpdater.downloadUpdate();
+      updater.downloadUpdate();
       return { success: true };
     } catch (err) {
       return { error: (err as Error).message };
@@ -93,7 +112,11 @@ export function initIpcHandlers() {
   });
 
   ipcMain.handle('quit-and-install', async () => {
-    autoUpdater.quitAndInstall();
+    const updater = getAutoUpdater();
+    if (!updater) {
+      return { error: 'Auto-update är inte tillgängligt' };
+    }
+    updater.quitAndInstall();
     return { success: true };
   });
 }
